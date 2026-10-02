@@ -81,18 +81,57 @@ static int evaluate(const ASTNode *expression, RuntimeVariable *variables,
                                                : left.data.float_value;
       float right_value = right.type == TYPE_INT ? (float)right.data.int_value
                                                   : right.data.float_value;
+      float float_result;
+      switch (expression->data.binary.op) {
+      case OP_ADD:
+        float_result = left_value + right_value;
+        break;
+      case OP_SUB:
+        float_result = left_value - right_value;
+        break;
+      case OP_MUL:
+        float_result = left_value * right_value;
+        break;
+      case OP_DIV:
+        if (right_value == 0.0f) {
+          fprintf(stderr, "Division by zero\n");
+          return 0;
+        }
+        float_result = left_value / right_value;
+        break;
+      default:
+        fprintf(stderr, "Unknown binary operator\n");
+        return 0;
+      }
       result->type = TYPE_FLOAT;
-      result->data.float_value = expression->data.binary.op == OP_ADD
-                                     ? left_value + right_value
-                                     : left_value - right_value;
+      result->data.float_value = float_result;
       return 1;
     }
 
     long long left_value = left.data.int_value;
     long long right_value = right.data.int_value;
-    long long value = expression->data.binary.op == OP_ADD
-                          ? left_value + right_value
-                          : left_value - right_value;
+    long long value;
+    switch (expression->data.binary.op) {
+    case OP_ADD:
+      value = left_value + right_value;
+      break;
+    case OP_SUB:
+      value = left_value - right_value;
+      break;
+    case OP_MUL:
+      value = left_value * right_value;
+      break;
+    case OP_DIV:
+      if (right_value == 0) {
+        fprintf(stderr, "Division by zero\n");
+        return 0;
+      }
+      value = left_value / right_value;
+      break;
+    default:
+      fprintf(stderr, "Unknown binary operator\n");
+      return 0;
+    }
     if (value < INT_MIN || value > INT_MAX) {
       fprintf(stderr, "Integer arithmetic overflow\n");
       return 0;
