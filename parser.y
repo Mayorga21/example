@@ -31,6 +31,7 @@ SymbolTable symbol_table;
 %token <char_val> TOKEN_CHAR_LITERAL
 
 %left '+' '-'
+%left '*' '/'
 
 //any of these non-terminal rules produce a result
 %type <node> program statement_list statement var_declaration print_statement expression
@@ -160,6 +161,26 @@ expression:
             YYERROR;
         }
         $$ = create_binary_node(OP_SUB, $1, $3);
+    }
+        | expression '*' expression {
+        if (($1->expressionType != TYPE_INT && $1->expressionType != TYPE_FLOAT) ||
+            ($3->expressionType != TYPE_INT && $3->expressionType != TYPE_FLOAT)) {
+            fprintf(stderr, "Multiplication requires numeric operands\n");
+            free_ast($1);
+            free_ast($3);
+            YYERROR;
+        }
+        $$ = create_binary_node(OP_MUL, $1, $3);
+    }
+    | expression '/' expression {
+        if (($1->expressionType != TYPE_INT && $1->expressionType != TYPE_FLOAT) ||
+            ($3->expressionType != TYPE_INT && $3->expressionType != TYPE_FLOAT)) {
+            fprintf(stderr, "Division requires numeric operands\n");
+            free_ast($1);
+            free_ast($3);
+            YYERROR;
+        }
+        $$ = create_binary_node(OP_DIV, $1, $3);
     }
     ;
 
