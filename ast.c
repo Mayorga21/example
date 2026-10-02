@@ -147,6 +147,16 @@ DataType *parse_string_data_type(char *value) {
   return type;
 }
 
+static const char *operator_symbol(BinaryOperator op) {
+  switch (op) {
+  case OP_ADD: return "+";
+  case OP_SUB: return "-";
+  case OP_MUL: return "*";
+  case OP_DIV: return "/";
+  }
+  return "?";
+}
+
 void print_ast(ASTNode *node) {
   while (node != NULL) {
     if (node->type == VAR_DECL || node->type == CONST_DECL) {
@@ -205,7 +215,7 @@ void print_ast(ASTNode *node) {
         break;
       case BINARY_OP:
         printf("BinaryOperation(%s)\n",
-               node->data.binary.op == OP_ADD ? "+" : "-");
+                  operator_symbol(node->data.binary.op));
         printf("  Left: ");
         print_ast(node->data.binary.left);
         printf("  Right: ");
